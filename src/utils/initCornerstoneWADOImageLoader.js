@@ -8,8 +8,8 @@ export default function initCornerstoneWADOImageLoader() {
   cornerstoneWADOImageLoader.configure({
     useWebWorkers: true,
     decodeConfig: {
-      convertFloatPixelDataToInt: false
-    }
+      convertFloatPixelDataToInt: false,
+    },
   });
 
   var config = {
@@ -18,9 +18,9 @@ export default function initCornerstoneWADOImageLoader() {
     taskConfiguration: {
       decodeTask: {
         initializeCodecsOnStartup: false,
-        strict: false
-      }
-    }
+        strict: false,
+      },
+    },
   };
 
   cornerstoneWADOImageLoader.webWorkerManager.initialize(config);

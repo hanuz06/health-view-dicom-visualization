@@ -13,7 +13,6 @@ const { DicomMetaDictionary } = dcmjs.data;
 const { calibratedPixelSpacingMetadataProvider } = utilities;
 
 const VOLUME = "volume";
-const STACK = "stack";
 
 /**
  * Uses dicomweb-client to fetch metadata of a study, cache it in cornerstone,
@@ -29,7 +28,7 @@ export default async function createImageIdsAndCacheMetaData({
   StudyInstanceUID,
   SeriesInstanceUID,
   wadoRsRoot,
-  type
+  type,
 }) {
   const SOP_INSTANCE_UID = "00080018";
   const SERIES_INSTANCE_UID = "0020000E";
@@ -37,7 +36,7 @@ export default async function createImageIdsAndCacheMetaData({
 
   const studySearchOptions = {
     studyInstanceUID: StudyInstanceUID,
-    seriesInstanceUID: SeriesInstanceUID
+    seriesInstanceUID: SeriesInstanceUID,
   };
 
   const client = new api.DICOMwebClient({ url: wadoRsRoot });
@@ -61,10 +60,7 @@ export default async function createImageIdsAndCacheMetaData({
       SOPInstanceUID +
       "/frames/1";
 
-    cornerstoneWADOImageLoader.wadors.metaDataManager.add(
-      imageId,
-      instanceMetaData
-    );
+    cornerstoneWADOImageLoader.wadors.metaDataManager.add(imageId, instanceMetaData);
 
     WADORSHeaderProvider.addInstance(imageId, instanceMetaData);
     // Add calibrated pixel spacing
@@ -74,7 +70,7 @@ export default async function createImageIdsAndCacheMetaData({
 
     calibratedPixelSpacingMetadataProvider.add(
       imageId,
-      pixelSpacing.map((s) => parseFloat(s))
+      pixelSpacing.map((s) => parseFloat(s)),
     );
 
     return imageId;
@@ -92,9 +88,7 @@ export default async function createImageIdsAndCacheMetaData({
       // It's showing up like 'DECY\\ATTN\\SCAT\\DTIM\\RAN\\RADL\\DCAL\\SLSENS\\NORM'
       // but calculate-suv expects ['DECY', 'ATTN', ...]
       if (typeof instanceMetadata.CorrectedImage === "string") {
-        instanceMetadata.CorrectedImage = instanceMetadata.CorrectedImage.split(
-          "\\"
-        );
+        instanceMetadata.CorrectedImage = instanceMetadata.CorrectedImage.split("\\");
       }
 
       if (instanceMetadata) {
@@ -102,14 +96,9 @@ export default async function createImageIdsAndCacheMetaData({
       }
     });
     if (InstanceMetadataArray.length) {
-      const suvScalingFactors = calculateSUVScalingFactors(
-        InstanceMetadataArray
-      );
+      const suvScalingFactors = calculateSUVScalingFactors(InstanceMetadataArray);
       InstanceMetadataArray.forEach((instanceMetadata, index) => {
-        ptScalingMetaDataProvider.addInstance(
-          imageIds[index],
-          suvScalingFactors[index]
-        );
+        ptScalingMetaDataProvider.addInstance(imageIds[index], suvScalingFactors[index]);
       });
     }
   }

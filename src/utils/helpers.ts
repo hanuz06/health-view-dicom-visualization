@@ -17,9 +17,7 @@ export const getViewportFromRenderingEngine = ({
     return null;
   }
 
-  const viewport = renderingEngine.getViewport(
-    viewportId
-  ) as Types.IStackViewport;
+  const viewport = renderingEngine.getViewport(viewportId) as Types.IStackViewport;
 
   if (!viewport) {
     console.error("Viewport is undefined");
@@ -29,10 +27,7 @@ export const getViewportFromRenderingEngine = ({
   return viewport;
 };
 
-export const handleZooming = (
-  renderingEngineId: string,
-  viewportId: string
-) => {
+export const handleZooming = (renderingEngineId: string, viewportId: string) => {
   const viewport = getViewportFromRenderingEngine({
     renderingEngineId,
     viewportId,
@@ -44,8 +39,7 @@ export const handleZooming = (
 
   const camera = viewport.getCamera();
 
-  const { parallelScale, focalPoint } =
-    cameraHelpers.getRandomlyTranslatedAndZoomedCameraProperties(camera);
+  const { parallelScale, focalPoint } = cameraHelpers.getRandomlyTranslatedAndZoomedCameraProperties(camera);
 
   const newCamera = {
     parallelScale,
@@ -84,10 +78,7 @@ export const handleFlipV = (renderingEngineId: string, viewportId: string) => {
   viewport.render();
 };
 
-export const handleRotateDelta30 = (
-  renderingEngineId: string,
-  viewportId: string
-) => {
+export const handleRotateDelta30 = (renderingEngineId: string, viewportId: string) => {
   const viewport = getViewportFromRenderingEngine({
     renderingEngineId,
     viewportId,
@@ -115,10 +106,7 @@ export const handleInvert = (renderingEngineId: string, viewportId: string) => {
   viewport.render();
 };
 
-export const handleApplyColormap = (
-  renderingEngineId: string,
-  viewportId: string
-) => {
+export const handleApplyColormap = (renderingEngineId: string, viewportId: string) => {
   const viewport = getViewportFromRenderingEngine({
     renderingEngineId,
     viewportId,
@@ -131,10 +119,7 @@ export const handleApplyColormap = (
   viewport.render();
 };
 
-export const handleResetViewport = (
-  renderingEngineId: string,
-  viewportId: string
-) => {
+export const handleResetViewport = (renderingEngineId: string, viewportId: string) => {
   const viewport = getViewportFromRenderingEngine({
     renderingEngineId,
     viewportId,
@@ -148,10 +133,7 @@ export const handleResetViewport = (
   viewport.render();
 };
 
-export const handleGoToPreviousImage = (
-  renderingEngineId: string,
-  viewportId: string
-) => {
+export const handleGoToPreviousImage = (renderingEngineId: string, viewportId: string) => {
   const viewport = getViewportFromRenderingEngine({
     renderingEngineId,
     viewportId,
@@ -171,10 +153,7 @@ export const handleGoToPreviousImage = (
   viewport.setImageIdIndex(newImageIdIndex);
 };
 
-export const handleGoToNextImage = (
-  renderingEngineId: string,
-  viewportId: string
-) => {
+export const handleGoToNextImage = (renderingEngineId: string, viewportId: string) => {
   const viewport = getViewportFromRenderingEngine({
     renderingEngineId,
     viewportId,
@@ -182,15 +161,15 @@ export const handleGoToNextImage = (
 
   if (!viewport) return;
 
-   // Get the current index of the image displayed
-    const currentImageIdIndex = viewport.getCurrentImageIdIndex();
+  // Get the current index of the image displayed
+  const currentImageIdIndex = viewport.getCurrentImageIdIndex();
 
-    // Increment the index, clamping to the last image if necessary
-    const numImages = viewport.getImageIds().length;
-    let newImageIdIndex = currentImageIdIndex + 1;
+  // Increment the index, clamping to the last image if necessary
+  const numImages = viewport.getImageIds().length;
+  let newImageIdIndex = currentImageIdIndex + 1;
 
-    newImageIdIndex = Math.min(newImageIdIndex, numImages - 1);
+  newImageIdIndex = Math.min(newImageIdIndex, numImages - 1);
 
-    // Set the new image index, the viewport itself does a re-render
-    viewport.setImageIdIndex(newImageIdIndex);
+  // Set the new image index, the viewport itself does a re-render
+  viewport.setImageIdIndex(newImageIdIndex);
 };

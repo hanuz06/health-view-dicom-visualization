@@ -1,15 +1,13 @@
-import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import vtkColorTransferFunction from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction';
-import vtkPiecewiseFunction from '@kitware/vtk.js/Common/DataModel/PiecewiseFunction';
+import vtkColorMaps from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps";
+import vtkColorTransferFunction from "@kitware/vtk.js/Rendering/Core/ColorTransferFunction";
+import vtkPiecewiseFunction from "@kitware/vtk.js/Common/DataModel/PiecewiseFunction";
 
-export default function setPetColorMapTransferFunctionForVolumeActor({
-  volumeActor,
-}) {
+export default function setPetColorMapTransferFunctionForVolumeActor({ volumeActor }) {
   const mapper = volumeActor.getMapper();
   mapper.setSampleDistance(1.0);
 
   const cfun = vtkColorTransferFunction.newInstance();
-  const preset = vtkColorMaps.getPresetByName('hsv');
+  const preset = vtkColorMaps.getPresetByName("hsv");
   cfun.applyColorMap(preset);
   cfun.setMappingRange(0, 5);
 

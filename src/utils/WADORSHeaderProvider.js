@@ -1,7 +1,7 @@
-import dcmjs from 'dcmjs';
-import { utilities as csUtils } from '@cornerstonejs/core';
+import dcmjs from "dcmjs";
+import { utilities as csUtils } from "@cornerstonejs/core";
 const metadataHeadersPerImageId = {};
-const INSTANCE = 'instance';
+const INSTANCE = "instance";
 
 const { DicomMessage, DicomMetaDictionary } = dcmjs.data;
 
@@ -20,9 +20,8 @@ function addInstance(imageId, dicomJSONDatasetOrP10ArrayBuffer) {
   // Check if dataset is already naturalized.
   let naturalizedDataset;
 
-  if (dicomJSONDataset['SeriesInstanceUID'] === undefined) {
-    naturalizedDataset =
-      DicomMetaDictionary.naturalizeDataset(dicomJSONDataset);
+  if (dicomJSONDataset["SeriesInstanceUID"] === undefined) {
+    naturalizedDataset = DicomMetaDictionary.naturalizeDataset(dicomJSONDataset);
   } else {
     naturalizedDataset = dicomJSONDataset;
   }

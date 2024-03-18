@@ -1,5 +1,3 @@
-import { RefObject } from "react";
-
 type ButtonProps = {
   title: string;
   onClick?: () => void;
@@ -8,7 +6,7 @@ type ButtonProps = {
 const ImageManipulationButton = ({ title, onClick }: ButtonProps) => {
   return (
     <button
-      className='bg-white hover:border-zinc-200 px-2 py-3 flex items-center justify-center font-semibold'
+      className="bg-white hover:border-zinc-200 px-2 py-3 flex items-center justify-center font-semibold"
       onClick={onClick}
     >
       {title}
