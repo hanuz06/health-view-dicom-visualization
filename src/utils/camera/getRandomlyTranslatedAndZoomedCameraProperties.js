@@ -1,14 +1,22 @@
 import { vec3 } from "gl-matrix";
 
-export default function getRandomlyTranslatedAndZoomedCameraProperties(
-  camera,
-  maxTranslateInMM
-) {
-  const { viewUp, viewPlaneNormal, parallelScale, position, focalPoint } =
-    camera;
+let modifierIndex = 0;
 
-  // Modify the zoom by some factor
-  const randomModifier = 0.5 + Math.random() - 0.5;
+export default function getRandomlyTranslatedAndZoomedCameraProperties(camera) {
+  const { viewUp, viewPlaneNormal, parallelScale, focalPoint } = camera;
+
+  const modifierValues = [0.9, 0.8, 0.7]; // Define the desired values for zoom levels
+
+  // Function to get the next random modifier value
+  const getNextModifier = () => {
+    const modifier = modifierValues[modifierIndex];
+    modifierIndex = (modifierIndex + 1) % modifierValues.length; // Cycle through the values
+    console.log(modifier);
+    return modifier;
+  };
+
+  // Usage example
+  const randomModifier = getNextModifier();
   const newParallelScale = parallelScale * randomModifier;
 
   // Move the camera in plane by some random number
@@ -18,32 +26,17 @@ export default function getRandomlyTranslatedAndZoomedCameraProperties(
 
   viewRight = [-viewRight[0], -viewRight[1], -viewRight[2]];
 
-  const randomPanX = maxTranslateInMM * (2.0 * Math.random() - 1);
-  const randomPanY = maxTranslateInMM * (2.0 * Math.random() - 1);
-
   const diff = [0, 0, 0];
 
-  // Pan X
-  for (let i = 0; i <= 2; i++) {
-    diff[i] += viewRight[i] * randomPanX;
-  }
-
-  // Pan Y
-  for (let i = 0; i <= 2; i++) {
-    diff[i] += viewUp[i] * randomPanY;
-  }
-
-  const newPosition = [];
+  // const newPosition = [];
   const newFocalPoint = [];
 
   for (let i = 0; i <= 2; i++) {
-    newPosition[i] = position[i] + diff[i];
     newFocalPoint[i] = focalPoint[i] + diff[i];
   }
 
   return {
     focalPoint: newFocalPoint,
-    position: newPosition,
     parallelScale: newParallelScale,
   };
 }

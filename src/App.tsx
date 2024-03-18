@@ -1,26 +1,26 @@
-import {
-  RenderingEngine,
-  Types,
-  Enums,
-  getRenderingEngine,
-} from "@cornerstonejs/core";
+import { RenderingEngine, Types, Enums } from "@cornerstonejs/core";
 
-import {
-  initDemo,
-  createImageIdsAndCacheMetaData,
-  ctVoiRange,
-  addButtonToToolbar,
-} from "./utils";
+import { initDemo, createImageIdsAndCacheMetaData, ctVoiRange } from "./utils";
 import { useEffect, useRef } from "react";
-import Title from "./components/Title";
+import {
+  getViewportFromRenderingEngine,
+  handleApplyColormap,
+  handleFlipH,
+  handleFlipV,
+  handleInvert,
+  handleResetViewport,
+  handleRotateDelta30,
+  handleZooming,
+  handleGoToPreviousImage,
+  handleGoToNextImage
+} from "./utils/helpers";
+import ImageManipulationButton from "./components/ImageManipulationButton";
 
 function App() {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const rotationInfoRef = useRef<HTMLDivElement>(null);
-  const flipHorizontalInfoRef = useRef<HTMLDivElement>(null);
-  const flipVerticalInfoRef = useRef<HTMLDivElement>(null);
+  const leftImageContainerRef = useRef<HTMLDivElement>(null);
+  const rightImageContainerRef = useRef<HTMLDivElement>(null);
 
-  const { ViewportType, Events } = Enums;
+  const { ViewportType } = Enums;
 
   const viewportId = "CT_STACK";
   const renderingEngineId = "myRenderingEngine";
@@ -46,7 +46,7 @@ function App() {
       const viewportInput = {
         viewportId,
         type: ViewportType.STACK,
-        element: elementRef.current!,
+        element: leftImageContainerRef.current!,
         defaultOptions: {
           background: [0.2, 0, 0.2] as Types.Point3,
         },
@@ -54,10 +54,12 @@ function App() {
 
       renderingEngine.enableElement(viewportInput);
 
-      // Get the stack viewport that was created
-      const viewport = renderingEngine.getViewport(
-        viewportId
-      ) as Types.IStackViewport;
+      const viewport = getViewportFromRenderingEngine({
+        renderingEngineId,
+        viewportId,
+      });
+
+      if (!viewport) return;
 
       // Define a stack containing a single image
       const stack = [imageIds[0], imageIds[1]];
@@ -73,111 +75,57 @@ function App() {
     }
 
     run();
-
-    // Add event listener after rendering
-    const viewportElement = elementRef.current;
-    if (viewportElement) {
-      viewportElement.addEventListener(
-        Events.CAMERA_MODIFIED,
-        handleCameraModified
-      );
-    }
-
-    // Cleanup
-    return () => {
-      if (viewportElement) {
-        viewportElement.removeEventListener(
-          Events.CAMERA_MODIFIED,
-          handleCameraModified
-        );
-      }
-    };
-  }, []);
-
-  const handleCameraModified = () => {
-    // Get the rendering engine
-    const renderingEngine = getRenderingEngine(renderingEngineId);
-
-    let viewport;
-
-    // Get the stack viewport
-    // Check if renderingEngine is defined
-    if (renderingEngine) {
-      // Get the stack viewport
-      viewport = renderingEngine.getViewport(
-        viewportId
-      ) as Types.IStackViewport;
-
-      // Check if viewport is defined
-      if (viewport) {
-        const { flipHorizontal, flipVertical } = viewport.getCamera();
-        const { rotation } = viewport.getProperties();
-
-        if (rotationInfoRef.current) {
-          rotationInfoRef.current.innerText = `Rotation: ${Math.round(
-            rotation as number
-          )}`;
-        }
-        if (flipHorizontalInfoRef.current) {
-          flipHorizontalInfoRef.current.innerText = `Flip horizontal: ${flipHorizontal}`;
-        }
-        if (flipVerticalInfoRef.current) {
-          flipVerticalInfoRef.current.innerText = `Flip vertical: ${flipVertical}`;
-        }
-      } else {
-        console.error("Viewport is undefined");
-        return;
-      }
-    } else {
-      console.error("Rendering engine is undefined");
-    }
-  };
-
-  // Define button click handler outside the useEffect hook
-  const handleRotateDelta30 = () => {
-    // Get the rendering engine
-    const renderingEngine = getRenderingEngine(renderingEngineId);
-
-    // Get the stack viewport
-    const viewport = renderingEngine?.getViewport(
-      viewportId
-    ) as Types.IStackViewport;
-
-    if (!viewport) {
-      console.error("Viewport is undefined");
-      return;
-    }
-
-    const { rotation } = viewport.getProperties();
-    viewport.setProperties({ rotation: rotation || 0 + 30 });
-
-    viewport.render();
-  };
-
-  // Add button to toolbar
-  addButtonToToolbar({
-    title: "Rotate Delta 30",
-    onClick: handleRotateDelta30,
-  });
+  }, [ViewportType.STACK]);
 
   return (
-    <div className='w-full h-full flex flex-col'>
-      <Title
-        title='Basic Stack'
-        description='Displays a single DICOM image in a Stack viewport.'
-      />
-      <div className='w-full'>
-        <div ref={rotationInfoRef}>Rotation</div>
-        <div ref={flipHorizontalInfoRef}>Flip horizontal</div>
-        <div ref={flipVerticalInfoRef}>Flip vertical</div>
-      </div>
-      <div className='flex w-full'>
+    <div className='w-screen h-screen flex flex-col'>
+      <nav className='flex items-center justify-between w-full h-28 px-10'>
+        <h3 className='text-xl font-bold'>Dicom Viewer(with Cornerstone.js)</h3>
+        <div className='flex gap-1'>
+          <ImageManipulationButton
+            title='Zoom'
+            onClick={() => handleZooming(renderingEngineId, viewportId)}
+          />
+          <ImageManipulationButton
+            title='Flip H'
+            onClick={() => handleFlipH(renderingEngineId, viewportId)}
+          />
+          <ImageManipulationButton
+            title='Flip V'
+            onClick={() => handleFlipV(renderingEngineId, viewportId)}
+          />
+          <ImageManipulationButton
+            title='Rotate Delta 30'
+            onClick={() => handleRotateDelta30(renderingEngineId, viewportId)}
+          />
+          <ImageManipulationButton
+            title='Invert'
+            onClick={() => handleInvert(renderingEngineId, viewportId)}
+          />
+          <ImageManipulationButton
+            title='Apply Colormap'
+            onClick={() => handleApplyColormap(renderingEngineId, viewportId)}
+          />
+          <ImageManipulationButton
+            title='Reset'
+            onClick={() => handleResetViewport(renderingEngineId, viewportId)}
+          />
+        </div>
+        <div className='flex'>
+          <button className='px-2 py-3 border flex items-center justify-center ml-1 font-semibold text-white bg-main hover:bg-blue-700' onClick={()=>handleGoToPreviousImage(renderingEngineId, viewportId)}>
+            Previous Image
+          </button>
+          <button className='px-2 py-3 border flex items-center justify-center ml-1 font-semibold text-white bg-main hover:bg-blue-700' onClick={()=>handleGoToNextImage(renderingEngineId, viewportId)}>
+            Next Image
+          </button>
+        </div>
+      </nav>
+      <div className='flex w-full h-full'>
         <div
-          id='cornerstone-element'
-          className='h-80 w-1/2 border border-red-300'
-          ref={elementRef}
+          className='w-1/2 border-4 border-main'
+          ref={leftImageContainerRef}
         ></div>
-        <div className='w-1/2 border border-red-300'></div>
+        <div className='w-1/2' ref={rightImageContainerRef}></div>
       </div>
     </div>
   );
