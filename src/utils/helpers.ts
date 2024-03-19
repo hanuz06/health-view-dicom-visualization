@@ -1,5 +1,5 @@
 import { Types, getRenderingEngine } from "@cornerstonejs/core";
-import { camera as cameraHelpers } from "../utils";
+import { camera as cameraHelpers } from ".";
 
 type GetViewportFromRenderingEngineProps = {
   renderingEngineId: string;
