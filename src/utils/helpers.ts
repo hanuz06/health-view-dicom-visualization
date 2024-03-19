@@ -20,7 +20,7 @@ export const getViewportFromRenderingEngine = ({
   const viewport = renderingEngine.getViewport(viewportId) as Types.IStackViewport;
 
   if (!viewport) {
-    console.error("Viewport is undefined");
+    console.error("MedicalViewport is undefined");
     return null;
   }
 
@@ -141,15 +141,12 @@ export const handleGoToPreviousImage = (renderingEngineId: string, viewportId: s
 
   if (!viewport) return;
 
-  // Get the current index of the image displayed
   const currentImageIdIndex = viewport.getCurrentImageIdIndex();
 
-  // Increment the index, clamping to the first image if necessary
   let newImageIdIndex = currentImageIdIndex - 1;
 
   newImageIdIndex = Math.max(newImageIdIndex, 0);
 
-  // Set the new image index, the viewport itself does a re-render
   viewport.setImageIdIndex(newImageIdIndex);
 };
 
@@ -161,15 +158,12 @@ export const handleGoToNextImage = (renderingEngineId: string, viewportId: strin
 
   if (!viewport) return;
 
-  // Get the current index of the image displayed
   const currentImageIdIndex = viewport.getCurrentImageIdIndex();
 
-  // Increment the index, clamping to the last image if necessary
   const numImages = viewport.getImageIds().length;
   let newImageIdIndex = currentImageIdIndex + 1;
 
   newImageIdIndex = Math.min(newImageIdIndex, numImages - 1);
 
-  // Set the new image index, the viewport itself does a re-render
   viewport.setImageIdIndex(newImageIdIndex);
 };

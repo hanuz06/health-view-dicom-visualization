@@ -1,119 +1,124 @@
-import { RenderingEngine, Types, Enums } from "@cornerstonejs/core";
-
+import { useEffect, useRef, useState } from "react";
+import { RenderingEngine, Enums } from "@cornerstonejs/core";
 import { initDemo, createImageIdsAndCacheMetaData, ctVoiRange } from "./utils";
-import { useEffect, useRef } from "react";
-import {
-  getViewportFromRenderingEngine,
-  handleApplyColormap,
-  handleFlipH,
-  handleFlipV,
-  handleInvert,
-  handleResetViewport,
-  handleRotateDelta30,
-  handleZooming,
-  handleGoToPreviousImage,
-  handleGoToNextImage,
-} from "./utils/helpers";
-import ImageManipulationButton from "./components/ImageManipulationButton";
+import { getViewportFromRenderingEngine } from "./utils/helpers";
+import { MedicalViewport } from "./types/constants";
+
+import ImageContainer from "./components/ImageContainer";
+import NavigationBar from "./components/NavigationBar";
+
+// Get Cornerstone imageIds and fetch metadata into RAM
+const imageIds = await createImageIdsAndCacheMetaData({
+  StudyInstanceUID: "1.3.6.1.4.1.14519.5.2.1.7009.2403.334240657131972136850343327463",
+  SeriesInstanceUID: "1.3.6.1.4.1.14519.5.2.1.7009.2403.226151125820845824875394858561",
+  wadoRsRoot: "https://d3t6nz73ql33tx.cloudfront.net/dicomweb",
+});
 
 function App() {
+  const [viewportId, setViewportId] = useState<MedicalViewport>(MedicalViewport.LEFT_CT_STACK_VIEWPORT);
+
   const leftImageContainerRef = useRef<HTMLDivElement>(null);
   const rightImageContainerRef = useRef<HTMLDivElement>(null);
 
   const { ViewportType } = Enums;
 
-  const viewportId = "CT_STACK";
   const renderingEngineId = "myRenderingEngine";
 
   useEffect(() => {
-    async function run() {
-      // Init Cornerstone and related libraries
+    async function initialRun() {
       await initDemo();
 
-      // Get Cornerstone imageIds and fetch metadata into RAM
-      const imageIds = await createImageIdsAndCacheMetaData({
-        StudyInstanceUID: "1.3.6.1.4.1.14519.5.2.1.7009.2403.334240657131972136850343327463",
-        SeriesInstanceUID: "1.3.6.1.4.1.14519.5.2.1.7009.2403.226151125820845824875394858561",
-        wadoRsRoot: "https://d3t6nz73ql33tx.cloudfront.net/dicomweb",
-      });
-
-      // Instantiate a rendering engine
       const renderingEngine = new RenderingEngine(renderingEngineId);
 
-      // Create a stack viewport
-      const viewportInput = {
-        viewportId,
+      const leftViewportInput = {
+        viewportId: MedicalViewport.LEFT_CT_STACK_VIEWPORT,
         type: ViewportType.STACK,
         element: leftImageContainerRef.current!,
-        defaultOptions: {
-          background: [0.2, 0, 0.2] as Types.Point3,
-        },
       };
 
-      renderingEngine.enableElement(viewportInput);
+      const rightViewportInput = {
+        viewportId: MedicalViewport.RIGHT_CT_STACK_VIEWPORT,
+        type: ViewportType.STACK,
+        element: rightImageContainerRef.current!,
+      };
 
-      const viewport = getViewportFromRenderingEngine({
+      renderingEngine.enableElement(leftViewportInput);
+      renderingEngine.enableElement(rightViewportInput);
+
+      const leftViewport = getViewportFromRenderingEngine({
         renderingEngineId,
-        viewportId,
+        viewportId: MedicalViewport.LEFT_CT_STACK_VIEWPORT,
       });
 
-      if (!viewport) return;
+      const rightViewport = getViewportFromRenderingEngine({
+        renderingEngineId,
+        viewportId: MedicalViewport.RIGHT_CT_STACK_VIEWPORT,
+      });
 
-      // Define a stack containing a single image
+      if (!leftViewport || !rightViewport) return;
+
       const stack = [imageIds[0], imageIds[1]];
 
-      // Set the stack on the viewport
-      await viewport.setStack(stack);
+      await leftViewport.setStack(stack);
+      await rightViewport.setStack(stack);
 
-      // Set the VOI of the stack
-      viewport.setProperties({ voiRange: ctVoiRange });
+      leftViewport.setProperties({ voiRange: ctVoiRange });
+      rightViewport.setProperties({ voiRange: ctVoiRange });
 
-      // Render the image
-      viewport.render();
+      leftViewport.render();
+      rightViewport.render();
     }
 
-    run();
-  }, [ViewportType.STACK]);
+    initialRun();
+  }, []);
+
+  async function updateViewport(currentImageContainer: HTMLDivElement, currentViewportId: MedicalViewport) {
+    const renderingEngine = new RenderingEngine(renderingEngineId);
+
+    const viewportInput = {
+      viewportId: currentViewportId,
+      type: ViewportType.STACK,
+      element: currentImageContainer,
+    };
+
+    renderingEngine.enableElement(viewportInput);
+
+    const viewport = getViewportFromRenderingEngine({
+      renderingEngineId,
+      viewportId: currentViewportId,
+    });
+
+    if (!viewport) return;
+
+    const stack = [imageIds[0], imageIds[1]];
+
+    await viewport.setStack(stack);
+
+    viewport.setProperties({ voiRange: ctVoiRange });
+
+    viewport.render();
+  }
+
+  const handleContainerClick = (imageContainer: MedicalViewport) => {
+    setViewportId(imageContainer);
+
+    if (imageContainer === MedicalViewport.LEFT_CT_STACK_VIEWPORT) {
+      updateViewport(leftImageContainerRef.current!, imageContainer);
+    } else {
+      updateViewport(rightImageContainerRef.current!, imageContainer);
+    }
+  };
 
   return (
-    <div className="w-screen h-screen flex flex-col">
-      <nav className="flex items-center justify-between w-full h-28 px-10">
-        <h3 className="text-xl font-bold">Dicom Viewer(with Cornerstone.js)</h3>
-        <div className="flex gap-1">
-          <ImageManipulationButton title="Zoom" onClick={() => handleZooming(renderingEngineId, viewportId)} />
-          <ImageManipulationButton title="Flip H" onClick={() => handleFlipH(renderingEngineId, viewportId)} />
-          <ImageManipulationButton title="Flip V" onClick={() => handleFlipV(renderingEngineId, viewportId)} />
-          <ImageManipulationButton
-            title="Rotate Delta 30"
-            onClick={() => handleRotateDelta30(renderingEngineId, viewportId)}
-          />
-          <ImageManipulationButton title="Invert" onClick={() => handleInvert(renderingEngineId, viewportId)} />
-          <ImageManipulationButton
-            title="Apply Colormap"
-            onClick={() => handleApplyColormap(renderingEngineId, viewportId)}
-          />
-          <ImageManipulationButton title="Reset" onClick={() => handleResetViewport(renderingEngineId, viewportId)} />
-        </div>
-        <div className="flex">
-          <button
-            className="px-2 py-3 border flex items-center justify-center ml-1 font-semibold text-white bg-main hover:bg-blue-700"
-            onClick={() => handleGoToPreviousImage(renderingEngineId, viewportId)}
-          >
-            Previous Image
-          </button>
-          <button
-            className="px-2 py-3 border flex items-center justify-center ml-1 font-semibold text-white bg-main hover:bg-blue-700"
-            onClick={() => handleGoToNextImage(renderingEngineId, viewportId)}
-          >
-            Next Image
-          </button>
-        </div>
-      </nav>
-      <div className="flex w-full h-full">
-        <div className="w-1/2 border-4 border-main" ref={leftImageContainerRef}></div>
-        <div className="w-1/2" ref={rightImageContainerRef}></div>
-      </div>
-    </div>
+    <main className="w-screen h-screen flex flex-col">
+      <NavigationBar renderingEngineId={renderingEngineId} viewportId={viewportId} />
+      <ImageContainer
+        viewportId={viewportId}
+        leftRef={leftImageContainerRef}
+        rightRef={rightImageContainerRef}
+        handleContainerClick={handleContainerClick}
+      />
+    </main>
   );
 }
 
