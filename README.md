@@ -17,7 +17,7 @@ npm run dev
 
 ## Screenshots of DICOM image visualization viewer in action
 
-<img src="src/assets/dicom-image-viewer.gif" width="500" height="250"/>
+<img src="src/assets/dicom-image-viewer.gif" width="600" height="300"/>
 
 <br>
 <br>
