@@ -112,7 +112,7 @@ function App() {
   };
 
   return (
-    <main className="w-screen h-screen flex flex-col">
+    <div className="w-screen h-screen flex flex-col">
       <NavigationBar renderingEngineId={renderingEngineId} viewportId={viewportId} />
       <ImageContainer
         viewportId={viewportId}
@@ -120,7 +120,7 @@ function App() {
         rightRef={rightRef}
         handleContainerClick={handleContainerClick}
       />
-    </main>
+    </div>
   );
 }
 

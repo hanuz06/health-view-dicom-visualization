@@ -9,18 +9,18 @@ interface ImageContainerProps {
 
 const ImageContainer: React.FC<ImageContainerProps> = ({ viewportId, leftRef, rightRef, handleContainerClick }) => {
   return (
-    <div className="flex w-full h-full">
-      <div
+    <main className="flex w-full h-full">
+      <section
         className={`w-1/2 ${viewportId === MedicalViewport.LEFT_CT_STACK_VIEWPORT && "border-4 border-main p-0.5"}`}
         ref={leftRef}
         onClick={() => handleContainerClick(MedicalViewport.LEFT_CT_STACK_VIEWPORT)}
-      ></div>
-      <div
+      ></section>
+      <section
         className={`w-1/2 ${viewportId === MedicalViewport.RIGHT_CT_STACK_VIEWPORT && "border-4 border-main p-0.5"}`}
         ref={rightRef}
         onClick={() => handleContainerClick(MedicalViewport.RIGHT_CT_STACK_VIEWPORT)}
-      ></div>
-    </div>
+      ></section>
+    </main>
   );
 };
 
