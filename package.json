@@ -10,6 +10,7 @@
     "lint:fix": "eslint ./src/** --fix",
     "format": "prettier --write .",
     "preview": "vite preview",
+    "tsc": "tsc",
     "prepare": "husky"
   },
   "dependencies": {
