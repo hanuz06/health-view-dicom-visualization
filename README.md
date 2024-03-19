@@ -2,7 +2,7 @@
 
 This is a DICOM image visualization viewer equipped with a range of image manipulation functionalities. Users have the ability to select image viewports, navigate seamlessly between images within these viewports, and perform various manipulations such as zooming, flipping, rotating, color inversion, applying colormaps, and resetting images to their default state.
 
-To see the application on Netlify please click 👉 [DICOM images viewer](https://fix-it-lhl.netlify.com/)
+To see the application on Netlify please click 👉 [DICOM images viewer](https://dicom-explorer.netlify.app/)
 
 ## Downloading the project
 
