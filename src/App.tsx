@@ -17,8 +17,8 @@ const imageIds = await createImageIdsAndCacheMetaData({
 function App() {
   const [viewportId, setViewportId] = useState<MedicalViewport>(MedicalViewport.LEFT_CT_STACK_VIEWPORT);
 
-  const leftImageContainerRef = useRef<HTMLDivElement>(null);
-  const rightImageContainerRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
 
   const { ViewportType } = Enums;
 
@@ -33,13 +33,13 @@ function App() {
       const leftViewportInput = {
         viewportId: MedicalViewport.LEFT_CT_STACK_VIEWPORT,
         type: ViewportType.STACK,
-        element: leftImageContainerRef.current!,
+        element: leftRef.current!,
       };
 
       const rightViewportInput = {
         viewportId: MedicalViewport.RIGHT_CT_STACK_VIEWPORT,
         type: ViewportType.STACK,
-        element: rightImageContainerRef.current!,
+        element: rightRef.current!,
       };
 
       renderingEngine.enableElement(leftViewportInput);
@@ -70,7 +70,7 @@ function App() {
     }
 
     initialRun();
-  }, []);
+  }, [ViewportType.STACK]);
 
   async function updateViewport(currentImageContainer: HTMLDivElement, currentViewportId: MedicalViewport) {
     const renderingEngine = new RenderingEngine(renderingEngineId);
@@ -103,9 +103,9 @@ function App() {
     setViewportId(imageContainer);
 
     if (imageContainer === MedicalViewport.LEFT_CT_STACK_VIEWPORT) {
-      updateViewport(leftImageContainerRef.current!, imageContainer);
+      updateViewport(leftRef.current!, imageContainer);
     } else {
-      updateViewport(rightImageContainerRef.current!, imageContainer);
+      updateViewport(rightRef.current!, imageContainer);
     }
   };
 
@@ -114,8 +114,8 @@ function App() {
       <NavigationBar renderingEngineId={renderingEngineId} viewportId={viewportId} />
       <ImageContainer
         viewportId={viewportId}
-        leftRef={leftImageContainerRef}
-        rightRef={rightImageContainerRef}
+        leftRef={leftRef}
+        rightRef={rightRef}
         handleContainerClick={handleContainerClick}
       />
     </main>

@@ -11,7 +11,6 @@ export default function getRandomlyTranslatedAndZoomedCameraProperties(camera) {
   const getNextModifier = () => {
     const modifier = modifierValues[modifierIndex];
     modifierIndex = (modifierIndex + 1) % modifierValues.length; // Cycle through the values
-    console.log(modifier);
     return modifier;
   };
 
@@ -28,7 +27,6 @@ export default function getRandomlyTranslatedAndZoomedCameraProperties(camera) {
 
   const diff = [0, 0, 0];
 
-  // const newPosition = [];
   const newFocalPoint = [];
 
   for (let i = 0; i <= 2; i++) {

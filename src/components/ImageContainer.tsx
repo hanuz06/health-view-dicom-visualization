@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { MedicalViewport } from "../types/constants";
 
 interface ImageContainerProps {
@@ -9,10 +8,6 @@ interface ImageContainerProps {
 }
 
 const ImageContainer: React.FC<ImageContainerProps> = ({ viewportId, leftRef, rightRef, handleContainerClick }) => {
-  useEffect(() => {
-    console.log(viewportId);
-  }, [viewportId]);
-
   return (
     <div className="flex w-full h-full">
       <div

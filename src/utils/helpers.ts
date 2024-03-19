@@ -13,14 +13,14 @@ export const getViewportFromRenderingEngine = ({
   const renderingEngine = getRenderingEngine(renderingEngineId);
 
   if (!renderingEngine) {
-    console.error("Rendering engine is undefined");
+    alert("Rendering engine is undefined");
     return null;
   }
 
   const viewport = renderingEngine.getViewport(viewportId) as Types.IStackViewport;
 
   if (!viewport) {
-    console.error("MedicalViewport is undefined");
+    alert("MedicalViewport is undefined");
     return null;
   }
 
