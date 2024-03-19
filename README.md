@@ -17,13 +17,17 @@ npm run dev
 
 ## Screenshots of DICOM image visualization viewer in action
 
-!["DICOM image visualization viewer-1"](src/assets/dicom-image-viewer.gif)
+<img src="src/assets/dicom-image-viewer.gif" width="500%" height="250"/>
+
+<br>
+<br>
 
 !["DICOM image visualization viewer-1"](src/assets/dicom-viewer-images/dicom-image-1.png)
 
 !["DICOM image visualization viewer-2"](src/assets/dicom-viewer-images/dicom-image-2.png)
 
 ## Dependencies
+
 - Node 18.x or above
 - NPM 9.x or above
 - react 18.2.0
