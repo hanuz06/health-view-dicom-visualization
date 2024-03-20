@@ -5,7 +5,7 @@ const INSTANCE = "instance";
 
 const { DicomMessage, DicomMetaDictionary } = dcmjs.data;
 
-function addInstance(imageId, dicomJSONDatasetOrP10ArrayBuffer) {
+function addInstance(imageId: string, dicomJSONDatasetOrP10ArrayBuffer: ArrayBuffer) {
   let dicomJSONDataset;
 
   // If Arraybuffer, parse to DICOMJSON before naturalizing.
@@ -30,7 +30,7 @@ function addInstance(imageId, dicomJSONDatasetOrP10ArrayBuffer) {
   metadataHeadersPerImageId[imageURI] = naturalizedDataset;
 }
 
-function get(query, imageId) {
+function get(query: string, imageId: string) {
   const imageURI = csUtils.imageIdToURI(imageId);
 
   if (query === INSTANCE) {

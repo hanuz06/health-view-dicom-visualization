@@ -81,7 +81,7 @@ export default function getPixelSpacingInformation(instance) {
       // Estimated Radiographic Magnification Factor and the user informed of that.
       // TODO: should this correction be done before all of this logic?
       CorrectedImagerPixelSpacing = ImagerPixelSpacing.map(
-        (pixelSpacing) => pixelSpacing / EstimatedRadiographicMagnificationFactor,
+        (pixelSpacing: any) => pixelSpacing / EstimatedRadiographicMagnificationFactor,
       );
     } else {
       console.warn("EstimatedRadiographicMagnificationFactor was not present. Unable to correct ImagerPixelSpacing.");
@@ -106,7 +106,7 @@ export default function getPixelSpacingInformation(instance) {
     console.warn(
       "Sequence of Ultrasound Regions > one entry. This is not yet implemented, all measurements will be shown in pixels.",
     );
-  } else if (isProjection === false && !ImagerPixelSpacing) {
+  } else if (!isProjection && !ImagerPixelSpacing) {
     // If only Pixel Spacing is present, and this is not a projection radiograph,
     // we can stop here
     return {

@@ -4,7 +4,6 @@ import { calculateSUVScalingFactors } from "@cornerstonejs/calculate-suv";
 import { getPTImageIdInstanceMetadata } from "./getPTImageIdInstanceMetadata";
 import { utilities } from "@cornerstonejs/core";
 import cornerstoneWADOImageLoader from "cornerstone-wado-image-loader";
-
 import WADORSHeaderProvider from "./WADORSHeaderProvider";
 import ptScalingMetaDataProvider from "./ptScalingMetaDataProvider";
 import getPixelSpacingInformation from "./getPixelSpacingInformation";
@@ -12,38 +11,46 @@ import getPixelSpacingInformation from "./getPixelSpacingInformation";
 const { DicomMetaDictionary } = dcmjs.data;
 const { calibratedPixelSpacingMetadataProvider } = utilities;
 
-const VOLUME = "volume";
+interface ImageMetaData {
+  [key: string]: any;
+}
 
-/**
- * Uses dicomweb-client to fetch metadata of a study, cache it in cornerstone,
- * and return a list of imageIds for the frames.
- *
- * Uses the app config to choose which study to fetch, and which
- * dicom-web server to fetch it from.
- *
- * @returns {string[]} An array of imageIds for instances in the study.
- */
+interface StudySearchOptions {
+  studyInstanceUID: string;
+  seriesInstanceUID: string;
+}
+
+interface CreateImageIdsAndCacheMetaDataProps {
+  StudyInstanceUID: string;
+  SeriesInstanceUID: string;
+  wadoRsRoot: string;
+  type: string;
+}
+
+type ImageIdArray = string[];
+
+const VOLUME = "volume";
 
 export default async function createImageIdsAndCacheMetaData({
   StudyInstanceUID,
   SeriesInstanceUID,
   wadoRsRoot,
   type,
-}) {
+}: CreateImageIdsAndCacheMetaDataProps): Promise<ImageIdArray> {
   const SOP_INSTANCE_UID = "00080018";
   const SERIES_INSTANCE_UID = "0020000E";
   const MODALITY = "00080060";
 
-  const studySearchOptions = {
+  const studySearchOptions: StudySearchOptions = {
     studyInstanceUID: StudyInstanceUID,
     seriesInstanceUID: SeriesInstanceUID,
   };
 
   const client = new api.DICOMwebClient({ url: wadoRsRoot });
   const instances = await client.retrieveSeriesMetadata(studySearchOptions);
-  console.warn(instances.length);
+
   const modality = instances[0][MODALITY].Value[0];
-  const imageIds = instances.map((instanceMetaData) => {
+  const imageIds: ImageIdArray = instances.map((instanceMetaData: ImageMetaData) => {
     const SeriesInstanceUID = instanceMetaData[SERIES_INSTANCE_UID].Value[0];
     const SOPInstanceUID = instanceMetaData[SOP_INSTANCE_UID].Value[0];
 
@@ -61,32 +68,25 @@ export default async function createImageIdsAndCacheMetaData({
       "/frames/1";
 
     cornerstoneWADOImageLoader.wadors.metaDataManager.add(imageId, instanceMetaData);
-
     WADORSHeaderProvider.addInstance(imageId, instanceMetaData);
-    // Add calibrated pixel spacing
+
     const m = JSON.parse(JSON.stringify(instanceMetaData));
     const instance = DicomMetaDictionary.naturalizeDataset(m);
     const pixelSpacing = getPixelSpacingInformation(instance);
 
     calibratedPixelSpacingMetadataProvider.add(
       imageId,
-      pixelSpacing.map((s) => parseFloat(s)),
+      pixelSpacing.map((s: string) => parseFloat(s)),
     );
 
     return imageId;
   });
 
-  // we don't want to add non-pet
-  // Note: for 99% of scanners SUV calculation is consistent bw slices
   if (modality === "PT") {
-    const InstanceMetadataArray = [];
-    imageIds.forEach((imageId) => {
+    const InstanceMetadataArray: any[] = [];
+    imageIds.forEach((imageId: string) => {
       const instanceMetadata = getPTImageIdInstanceMetadata(imageId);
 
-      // TODO: Temporary fix because static-wado is producing a string, not an array of values
-      // (or maybe dcmjs isn't parsing it correctly?)
-      // It's showing up like 'DECY\\ATTN\\SCAT\\DTIM\\RAN\\RADL\\DCAL\\SLSENS\\NORM'
-      // but calculate-suv expects ['DECY', 'ATTN', ...]
       if (typeof instanceMetadata.CorrectedImage === "string") {
         instanceMetadata.CorrectedImage = instanceMetadata.CorrectedImage.split("\\");
       }
@@ -95,13 +95,14 @@ export default async function createImageIdsAndCacheMetaData({
         InstanceMetadataArray.push(instanceMetadata);
       }
     });
+
     if (InstanceMetadataArray.length) {
       const suvScalingFactors = calculateSUVScalingFactors(InstanceMetadataArray);
-      InstanceMetadataArray.forEach((instanceMetadata, index) => {
+      InstanceMetadataArray.forEach((_, index) => {
         ptScalingMetaDataProvider.addInstance(imageIds[index], suvScalingFactors[index]);
       });
     }
   }
-  // debugger;
+
   return imageIds;
 }

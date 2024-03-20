@@ -1,13 +1,17 @@
 import { utilities as csUtils } from "@cornerstonejs/core";
 
-const scalingPerImageId = {};
+interface ScalingPerImageId {
+  [imageURI: string]: any;
+}
 
-function addInstance(imageId, scalingMetaData) {
+const scalingPerImageId: ScalingPerImageId = {};
+
+function addInstance(imageId: string, scalingMetaData: any) {
   const imageURI = csUtils.imageIdToURI(imageId);
   scalingPerImageId[imageURI] = scalingMetaData;
 }
 
-function get(type, imageId) {
+function get(type: string, imageId: string) {
   if (type === "scalingModule") {
     const imageURI = csUtils.imageIdToURI(imageId);
     return scalingPerImageId[imageURI];
