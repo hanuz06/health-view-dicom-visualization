@@ -1,21 +1,21 @@
-# DICOM image visualization
+# DICOM images visualization
 
-이것은 다양한 이미지 조작 기능이 장착된 DICOM 이미지 시각화 뷰어입니다. 사용자는 이미지 뷰포트를 선택하고 이러한 뷰포트 내의 이미지 사이를 매끄럽게 이동하며 줌, 뒤집기, 회전, 색상 반전, 컬러맵 적용 및 이미지를 기본 상태로 재설정하는 등 다양한 조작을 수행할 수 있습니다.
+This is a DICOM image visualization viewer equipped with a range of image manipulation functionalities. Users have the ability to select image viewports, navigate seamlessly between images within these viewports, and perform various manipulations such as zooming, flipping, rotating, color inversion, applying colormaps, and resetting images to their default state.
 
-Netlify에서 애플리케이션을 보려면 클릭하세요: 👉 [DICOM images viewer](https://dicom-explorer.netlify.app/)
+To see the application on Netlify please click 👉 [DICOM images viewer](https://dicom-explorer.netlify.app/)
 
-## 프로젝트를 다운로드합니다
+## Downloading the project
 
-이 저장소를 포크하고 클론합니다
+Fork and clone this repo
 
-## 프로젝트를 로컬에서 실행합니다
+## Running the project localy
 
 ```sh
 npm install
 npm run dev
 ```
 
-## DICOM 이미지 시각화 뷰어 작동 중인 스크린샷
+## Screenshots of DICOM image visualization viewer in action
 
 <img src="src/assets/dicom-image-viewer.gif" width="600" height="340"/>
 
@@ -26,12 +26,12 @@ npm run dev
 
 !["DICOM image visualization viewer-2"](src/assets/dicom-viewer-images/dicom-image-2.png)
 
-## 의존성
+## Dependencies
 
 - Node 18.x or above
 - NPM 9.x or above
 - react 18.2.0
-- @cornerstonejs/core 1.66.7
+- @cornerstonejs/core 1.66.6
 - @cornerstonejs/tools 0.20.11
 - @kitware/vtk.js 24.18.7
 - cornerstone-wado-image-loader 4.1.3
